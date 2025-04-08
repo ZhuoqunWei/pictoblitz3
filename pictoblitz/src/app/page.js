@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -15,7 +16,9 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col mt-20 gap-10 justify-center items-center">
-            <button className="p-4 w-fit h-[50px] bg-cyan-600 text-white text-xl">Play</button>
+            <Link href="/canvas">
+              <button className="p-4 w-fit h-[50px] bg-cyan-600 text-white text-xl">Play</button>
+            </Link>
             <button className="p-4 w-fit h-[50px] bg-cyan-600 text-white text-xl">Create Room</button>
           </div>
 
