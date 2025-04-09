@@ -1,41 +1,38 @@
+"use client";
+
 import Image from "next/image";
 import Link from 'next/link'
 
-import { signInWithPopup } from "firebase/auth";
-// import { auth, googleProvider } from "@/lib/firebase";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth, googleProvider } from "@/lib/firebase";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
 
-  const handleSignIn = () => {
-    const provider = new GoogleAuthProvider();
-    
-    signInWithPopup(auth, provider)
-    .then((result) => {
-      // This gives you a Google Access Token. You can use it to access the Google API.
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      // The signed-in user info.
+  const [user, setUser] = useState(null);
+  const router = useRouter();
+
+  const handleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      
+      // Get the user info
       const user = result.user;
-      console.log("token:", token)
-      console.log(user)
+      console.log("User signed in:", user);
+      
+      // Store the auth token
       localStorage.setItem("authToken", user.accessToken);
-      toast.success("Succesfully logged in!")
       
-
-      // IdP data available using getAdditionalUserInfo(result)
-      // ...
-    }).catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider.credentialFromError(error);
-
+      // Set user state
+      setUser(user);
       
-      // ...
-    });
+      // Redirect to profile page
+      router.push('/profile');
+    } catch (error) {
+      console.error("Error signing in:", error);
+      alert("Failed to sign in: " + error.message);
+    }
   }
 
   return (
@@ -46,6 +43,7 @@ export default function Home() {
           <div className="absolute top-10 right-5 justify-center">
             <div className="flex flex-row gap-10">
               <button
+                  onClick={handleSignIn}
                   className="flex items-center justify-center gap-2 bg-teal-700 text-white font-medium py-2 px-4 rounded-md border border-gray-300 hover:shadow-md transition-all hover:scale-105">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
