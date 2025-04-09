@@ -66,12 +66,15 @@ export default function Home() {
 
   return (
     <>
-      <canvas
+    <div className="p-24">
+    <canvas
         onMouseDown={() => setMouseDown(true)}
         ref={canvasRef}
         width={500}
         height={500}
         className="bg-white border border-black"></canvas>
+    </div>
+
     </>
   );
 }
