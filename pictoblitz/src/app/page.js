@@ -78,10 +78,12 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col mt-20 gap-10 justify-center items-center">
-            <Link href="/canvas">
-              <button className="flex items-center justify-center gap-2 bg-teal-700 text-white font-medium py-2 px-4 rounded-md border border-gray-300 hover:shadow-md transition-all hover:scale-105">Play</button>
+            <Link href="/rooms">
+              <button className="flex items-center justify-center gap-2 bg-teal-700 text-white font-medium py-2 px-4 rounded-md border border-gray-300 hover:shadow-md transition-all hover:scale-105">Play Multiplayer</button>
             </Link>
-            <button className="flex items-center justify-center gap-2 bg-teal-700 text-white font-medium py-2 px-4 rounded-md border border-gray-300 hover:shadow-md transition-all hover:scale-105">Create Room</button>
+            <Link href="/canvas">
+              <button className="flex items-center justify-center gap-2 bg-teal-700 text-white font-medium py-2 px-4 rounded-md border border-gray-300 hover:shadow-md transition-all hover:scale-105">Practice Drawing</button>
+            </Link>
           </div>
 
 
