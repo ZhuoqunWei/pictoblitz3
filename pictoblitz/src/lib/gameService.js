@@ -29,7 +29,7 @@ const PLAYERS_COLLECTION = 'players';
  * @param {number} maxPlayers - Maximum number of players (default: 8)
  * @returns {Promise<string>} - Room ID
  */
-export const createRoom = async (roomName, maxPlayers = 8) => {
+export const createRoom = async (roomName, maxPlayers = 8, maxRounds = 3) => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error('User not authenticated');
@@ -45,7 +45,7 @@ export const createRoom = async (roomName, maxPlayers = 8) => {
       status: 'waiting', // waiting, active, completed
       maxPlayers,
       currentRound: 0,
-      maxRounds: 3,
+      maxRounds,
       currentDrawer: '',
       currentWord: '',
       players: [

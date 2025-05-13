@@ -19,6 +19,7 @@ export default function Rooms() {
   const [rooms, setRooms] = useState([]);
   const [newRoomName, setNewRoomName] = useState("");
   const [maxPlayers, setMaxPlayers] = useState(8);
+  const [maxRounds, setMaxRounds] = useState(3);
   const [creatingRoom, setCreatingRoom] = useState(false);
   const [joiningRoom, setJoiningRoom] = useState(false);
   const [error, setError] = useState("");
@@ -83,6 +84,7 @@ export default function Rooms() {
       const { roomId } = await createRoom({
         roomName: newRoomName,
         maxPlayers,
+        maxRounds,
         user: {
           uid: user.uid,
           displayName: user.displayName,
@@ -177,6 +179,21 @@ export default function Rooms() {
                 >
                   {[2, 3, 4, 5, 6, 7, 8].map(num => (
                     <option key={num} value={num}>{num} players</option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label htmlFor="maxRounds" className="block text-gray-700 mb-2">
+                  Number of Rounds
+                </label>
+                <select
+                  id="maxRounds"
+                  value={maxRounds}
+                  onChange={(e) => setMaxRounds(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                    <option key={num} value={num}>{num} round{num !== 1 && 's'}</option>
                   ))}
                 </select>
               </div>

@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
   let currentRoomId = null;
 
   // Create a new room
-  socket.on('create_room', ({ roomName, maxPlayers, user }) => {
+  socket.on('create_room', ({ roomName, maxPlayers, maxRounds, user }) => {
     try {
       const roomId = generateRoomId();
       const newRoom = {
@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
         status: 'waiting',
         maxPlayers: maxPlayers || 8,
         currentRound: 0,
-        maxRounds: 3,
+        maxRounds: maxRounds || 3,
         currentDrawer: '',
         currentWord: '',
         players: [{
