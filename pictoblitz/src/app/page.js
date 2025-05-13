@@ -27,8 +27,8 @@ export default function Home() {
       // Set user state
       setUser(user);
       
-      // Redirect to profile page
-      router.push('/profile');
+      // Redirect to rooms page
+      router.push('/rooms');
     } catch (error) {
       console.error("Error signing in:", error);
       alert("Failed to sign in: " + error.message);
