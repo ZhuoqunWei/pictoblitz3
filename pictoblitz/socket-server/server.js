@@ -211,11 +211,44 @@ io.on('connection', (socket) => {
       const randomIndex = Math.floor(Math.random() * room.players.length);
       const firstDrawer = room.players[randomIndex].id;
 
-      // Simple word list (expand this later)
-      const words = ['apple', 'banana', 'cat', 'dog', 'elephant', 'fish', 'giraffe', 'house', 
-                     'airplane', 'book', 'computer', 'door', 'flower', 'guitar', 'hat', 
-                     'island', 'jacket', 'key', 'lamp', 'moon', 'mountain', 'nose', 
-                     'ocean', 'pencil', 'queen', 'river', 'sun', 'tree', 'umbrella'];
+      // Extended word list
+      const words = [
+        // Animals
+        'cat', 'dog', 'elephant', 'fish', 'giraffe', 'horse', 'lion', 'monkey', 'penguin', 'rabbit', 
+        'shark', 'snake', 'tiger', 'turtle', 'wolf', 'zebra', 'bear', 'chicken', 'duck', 'owl',
+        
+        // Food & Fruits
+        'apple', 'banana', 'burger', 'cake', 'carrot', 'cheese', 'cookie', 'grapes', 'hamburger', 'ice cream',
+        'lemon', 'orange', 'pizza', 'popcorn', 'sandwich', 'strawberry', 'sushi', 'taco', 'watermelon', 'donut',
+        
+        // Objects
+        'book', 'computer', 'door', 'flower', 'guitar', 'hat', 'key', 'lamp', 'pencil', 'umbrella',
+        'backpack', 'bicycle', 'camera', 'chair', 'clock', 'cup', 'glasses', 'shoes', 'table', 'television',
+        
+        // Places & Nature
+        'beach', 'castle', 'city', 'desert', 'forest', 'house', 'island', 'mountain', 'ocean', 'river',
+        'school', 'sun', 'tree', 'volcano', 'waterfall', 'bridge', 'cave', 'farm', 'park', 'tent',
+        
+        // Transportation
+        'airplane', 'bus', 'car', 'helicopter', 'motorcycle', 'rocket', 'ship', 'submarine', 'train', 'truck',
+        'boat', 'skateboard', 'spaceship', 'tractor', 'ambulance', 'balloon', 'canoe', 'scooter', 'taxi', 'unicycle',
+        
+        // Clothing
+        'jacket', 'shirt', 'shoe', 'sock', 'boot', 'dress', 'glove', 'hat', 'pants', 'scarf',
+        'sweater', 'tie', 'belt', 'crown', 'necklace', 'ring', 'watch', 'helmet', 'swimsuit', 'hoodie',
+        
+        // Sports & Games
+        'baseball', 'basketball', 'football', 'soccer', 'tennis', 'volleyball', 'chess', 'dice', 'frisbee', 'kite',
+        'puzzle', 'snowboard', 'surfboard', 'swing', 'whistle', 'bowling', 'golf', 'hockey', 'karate', 'ski',
+        
+        // Body Parts
+        'arm', 'ear', 'eye', 'foot', 'hand', 'heart', 'leg', 'nose', 'smile', 'tooth',
+        'brain', 'finger', 'hair', 'knee', 'lips', 'muscle', 'shoulder', 'skeleton', 'stomach', 'tongue',
+        
+        // Weather & Nature
+        'cloud', 'fire', 'lightning', 'moon', 'rainbow', 'rain', 'snow', 'star', 'sun', 'tornado',
+        'wind', 'comet', 'earth', 'flower', 'hurricane', 'leaf', 'planet', 'storm', 'wave', 'thunder'
+      ];
       const randomWord = words[Math.floor(Math.random() * words.length)];
 
       // Update room
@@ -370,10 +403,43 @@ io.on('connection', (socket) => {
       const nextDrawer = room.players[nextDrawerIndex].id;
 
       // Select new word
-      const words = ['apple', 'banana', 'cat', 'dog', 'elephant', 'fish', 'giraffe', 'house', 
-                     'airplane', 'book', 'computer', 'door', 'flower', 'guitar', 'hat', 
-                     'island', 'jacket', 'key', 'lamp', 'moon', 'mountain', 'nose', 
-                     'ocean', 'pencil', 'queen', 'river', 'sun', 'tree', 'umbrella'];
+      const words = [
+        // Animals
+        'cat', 'dog', 'elephant', 'fish', 'giraffe', 'horse', 'lion', 'monkey', 'penguin', 'rabbit', 
+        'shark', 'snake', 'tiger', 'turtle', 'wolf', 'zebra', 'bear', 'chicken', 'duck', 'owl',
+        
+        // Food & Fruits
+        'apple', 'banana', 'burger', 'cake', 'carrot', 'cheese', 'cookie', 'grapes', 'hamburger', 'ice cream',
+        'lemon', 'orange', 'pizza', 'popcorn', 'sandwich', 'strawberry', 'sushi', 'taco', 'watermelon', 'donut',
+        
+        // Objects
+        'book', 'computer', 'door', 'flower', 'guitar', 'hat', 'key', 'lamp', 'pencil', 'umbrella',
+        'backpack', 'bicycle', 'camera', 'chair', 'clock', 'cup', 'glasses', 'shoes', 'table', 'television',
+        
+        // Places & Nature
+        'beach', 'castle', 'city', 'desert', 'forest', 'house', 'island', 'mountain', 'ocean', 'river',
+        'school', 'sun', 'tree', 'volcano', 'waterfall', 'bridge', 'cave', 'farm', 'park', 'tent',
+        
+        // Transportation
+        'airplane', 'bus', 'car', 'helicopter', 'motorcycle', 'rocket', 'ship', 'submarine', 'train', 'truck',
+        'boat', 'skateboard', 'spaceship', 'tractor', 'ambulance', 'balloon', 'canoe', 'scooter', 'taxi', 'unicycle',
+        
+        // Clothing
+        'jacket', 'shirt', 'shoe', 'sock', 'boot', 'dress', 'glove', 'hat', 'pants', 'scarf',
+        'sweater', 'tie', 'belt', 'crown', 'necklace', 'ring', 'watch', 'helmet', 'swimsuit', 'hoodie',
+        
+        // Sports & Games
+        'baseball', 'basketball', 'football', 'soccer', 'tennis', 'volleyball', 'chess', 'dice', 'frisbee', 'kite',
+        'puzzle', 'snowboard', 'surfboard', 'swing', 'whistle', 'bowling', 'golf', 'hockey', 'karate', 'ski',
+        
+        // Body Parts
+        'arm', 'ear', 'eye', 'foot', 'hand', 'heart', 'leg', 'nose', 'smile', 'tooth',
+        'brain', 'finger', 'hair', 'knee', 'lips', 'muscle', 'shoulder', 'skeleton', 'stomach', 'tongue',
+        
+        // Weather & Nature
+        'cloud', 'fire', 'lightning', 'moon', 'rainbow', 'rain', 'snow', 'star', 'sun', 'tornado',
+        'wind', 'comet', 'earth', 'flower', 'hurricane', 'leaf', 'planet', 'storm', 'wave', 'thunder'
+      ];
       const randomWord = words[Math.floor(Math.random() * words.length)];
 
       // Update room
@@ -469,10 +535,43 @@ function handleRoundTimeout(roomId) {
       const nextDrawer = room.players[nextDrawerIndex].id;
 
       // Select new word
-      const words = ['apple', 'banana', 'cat', 'dog', 'elephant', 'fish', 'giraffe', 'house', 
-                     'airplane', 'book', 'computer', 'door', 'flower', 'guitar', 'hat', 
-                     'island', 'jacket', 'key', 'lamp', 'moon', 'mountain', 'nose', 
-                     'ocean', 'pencil', 'queen', 'river', 'sun', 'tree', 'umbrella'];
+      const words = [
+        // Animals
+        'cat', 'dog', 'elephant', 'fish', 'giraffe', 'horse', 'lion', 'monkey', 'penguin', 'rabbit', 
+        'shark', 'snake', 'tiger', 'turtle', 'wolf', 'zebra', 'bear', 'chicken', 'duck', 'owl',
+        
+        // Food & Fruits
+        'apple', 'banana', 'burger', 'cake', 'carrot', 'cheese', 'cookie', 'grapes', 'hamburger', 'ice cream',
+        'lemon', 'orange', 'pizza', 'popcorn', 'sandwich', 'strawberry', 'sushi', 'taco', 'watermelon', 'donut',
+        
+        // Objects
+        'book', 'computer', 'door', 'flower', 'guitar', 'hat', 'key', 'lamp', 'pencil', 'umbrella',
+        'backpack', 'bicycle', 'camera', 'chair', 'clock', 'cup', 'glasses', 'shoes', 'table', 'television',
+        
+        // Places & Nature
+        'beach', 'castle', 'city', 'desert', 'forest', 'house', 'island', 'mountain', 'ocean', 'river',
+        'school', 'sun', 'tree', 'volcano', 'waterfall', 'bridge', 'cave', 'farm', 'park', 'tent',
+        
+        // Transportation
+        'airplane', 'bus', 'car', 'helicopter', 'motorcycle', 'rocket', 'ship', 'submarine', 'train', 'truck',
+        'boat', 'skateboard', 'spaceship', 'tractor', 'ambulance', 'balloon', 'canoe', 'scooter', 'taxi', 'unicycle',
+        
+        // Clothing
+        'jacket', 'shirt', 'shoe', 'sock', 'boot', 'dress', 'glove', 'hat', 'pants', 'scarf',
+        'sweater', 'tie', 'belt', 'crown', 'necklace', 'ring', 'watch', 'helmet', 'swimsuit', 'hoodie',
+        
+        // Sports & Games
+        'baseball', 'basketball', 'football', 'soccer', 'tennis', 'volleyball', 'chess', 'dice', 'frisbee', 'kite',
+        'puzzle', 'snowboard', 'surfboard', 'swing', 'whistle', 'bowling', 'golf', 'hockey', 'karate', 'ski',
+        
+        // Body Parts
+        'arm', 'ear', 'eye', 'foot', 'hand', 'heart', 'leg', 'nose', 'smile', 'tooth',
+        'brain', 'finger', 'hair', 'knee', 'lips', 'muscle', 'shoulder', 'skeleton', 'stomach', 'tongue',
+        
+        // Weather & Nature
+        'cloud', 'fire', 'lightning', 'moon', 'rainbow', 'rain', 'snow', 'star', 'sun', 'tornado',
+        'wind', 'comet', 'earth', 'flower', 'hurricane', 'leaf', 'planet', 'storm', 'wave', 'thunder'
+      ];
       const randomWord = words[Math.floor(Math.random() * words.length)];
 
       // Update room
