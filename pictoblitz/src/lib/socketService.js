@@ -198,3 +198,9 @@ export const subscribeToErrors = (callback) => {
   socket.on('error', callback);
   return () => socket.off('error', callback);
 };
+
+export const subscribeToRoundTimeUp = (callback) => {
+  const socket = getSocket();
+  socket.on('round_time_up', callback);
+  return () => socket.off('round_time_up', callback);
+};

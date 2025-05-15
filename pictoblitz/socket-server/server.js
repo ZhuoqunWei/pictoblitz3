@@ -20,6 +20,7 @@ const io = new Server(server, {
 
 // Store active rooms
 const rooms = new Map();
+const ROUND_DURATION_MS = 90000; // 90 seconds per round
 
 // Socket.IO connection handler
 io.on('connection', (socket) => {
@@ -223,6 +224,8 @@ io.on('connection', (socket) => {
       room.currentDrawer = firstDrawer;
       room.currentWord = randomWord;
       room.gameStartedAt = new Date().toISOString();
+      room.roundStartedAt = new Date().toISOString();
+      room.roundEndTime = Date.now() + ROUND_DURATION_MS;
       room.lines = [];
 
       // Update room in store
@@ -231,6 +234,11 @@ io.on('connection', (socket) => {
       // Notify all clients in the room
       io.to(roomId).emit('game_started', room);
       console.log(`Game started in room ${roomId}`);
+      
+      // Set timer for round
+      setTimeout(() => {
+        handleRoundTimeout(roomId);
+      }, ROUND_DURATION_MS);
     } catch (error) {
       console.error('Error starting game:', error);
       socket.emit('error', { message: 'Failed to start game' });
@@ -373,12 +381,19 @@ io.on('connection', (socket) => {
       room.currentDrawer = nextDrawer;
       room.currentWord = randomWord;
       room.lines = [];
+      room.roundStartedAt = new Date().toISOString();
+      room.roundEndTime = Date.now() + ROUND_DURATION_MS;
 
       // Update room in store
       rooms.set(roomId, room);
 
       // Notify all clients in the room
       io.to(roomId).emit('round_started', room);
+      
+      // Set timer for round
+      setTimeout(() => {
+        handleRoundTimeout(roomId);
+      }, ROUND_DURATION_MS);
     } catch (error) {
       console.error('Error moving to next round:', error);
       socket.emit('error', { message: 'Failed to start next round' });
@@ -422,6 +437,64 @@ io.on('connection', (socket) => {
 // Helper function to generate room IDs
 function generateRoomId() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
+// Handle round timeout
+function handleRoundTimeout(roomId) {
+  const room = rooms.get(roomId);
+  if (!room || room.status !== 'active') return;
+  
+  // Notify all clients that time is up
+  io.to(roomId).emit('round_time_up', {
+    word: room.currentWord
+  });
+  
+  // Check if this was the last round
+  if (room.currentRound >= room.maxRounds) {
+    // End game
+    room.status = 'completed';
+    room.gameEndedAt = new Date().toISOString();
+
+    // Update room in store
+    rooms.set(roomId, room);
+
+    // Notify all clients in the room
+    io.to(roomId).emit('game_over', room);
+  } else {
+    // Auto move to next round after 5 seconds
+    setTimeout(() => {
+      // Find next drawer
+      const currentDrawerIndex = room.players.findIndex(player => player.id === room.currentDrawer);
+      const nextDrawerIndex = (currentDrawerIndex + 1) % room.players.length;
+      const nextDrawer = room.players[nextDrawerIndex].id;
+
+      // Select new word
+      const words = ['apple', 'banana', 'cat', 'dog', 'elephant', 'fish', 'giraffe', 'house', 
+                     'airplane', 'book', 'computer', 'door', 'flower', 'guitar', 'hat', 
+                     'island', 'jacket', 'key', 'lamp', 'moon', 'mountain', 'nose', 
+                     'ocean', 'pencil', 'queen', 'river', 'sun', 'tree', 'umbrella'];
+      const randomWord = words[Math.floor(Math.random() * words.length)];
+
+      // Update room
+      room.currentRound = room.currentRound + 1;
+      room.currentDrawer = nextDrawer;
+      room.currentWord = randomWord;
+      room.lines = [];
+      room.roundStartedAt = new Date().toISOString();
+      room.roundEndTime = Date.now() + ROUND_DURATION_MS;
+
+      // Update room in store
+      rooms.set(roomId, room);
+
+      // Notify all clients in the room
+      io.to(roomId).emit('round_started', room);
+      
+      // Set timer for next round
+      setTimeout(() => {
+        handleRoundTimeout(roomId);
+      }, ROUND_DURATION_MS);
+    }, 5000); // Wait 5 seconds before starting next round
+  }
 }
 
 // Health check route

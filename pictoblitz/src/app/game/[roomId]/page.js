@@ -23,7 +23,8 @@ import {
   subscribeToNewMessages,
   subscribeToCorrectGuess,
   subscribeToRoomDeleted,
-  subscribeToErrors
+  subscribeToErrors,
+  subscribeToRoundTimeUp
 } from "@/lib/socketService";
 
 export default function Game() {
@@ -42,8 +43,11 @@ export default function Game() {
   const [feedback, setFeedback] = useState("");
   const [messages, setMessages] = useState([]);
   const [isDrawer, setIsDrawer] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(90);
+  const [timerActive, setTimerActive] = useState(false);
   
   const messagesEndRef = useRef(null);
+  const timerIntervalRef = useRef(null);
 
   // Authentication check
   useEffect(() => {
@@ -91,6 +95,11 @@ export default function Game() {
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
           }
+          
+          // Start the timer
+          setTimeLeft(90);
+          setTimerActive(true);
+          startTimer();
         });
         
         const unsubscribeRoundStarted = subscribeToRoundStarted((gameData) => {
@@ -102,11 +111,18 @@ export default function Game() {
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
           }
+          
+          // Reset and start the timer
+          setTimeLeft(90);
+          setTimerActive(true);
+          startTimer();
         });
         
         const unsubscribeGameOver = subscribeToGameOver((gameData) => {
           setRoom(gameData);
           setFeedback("Game over!");
+          setTimerActive(false);
+          clearInterval(timerIntervalRef.current);
         });
         
         const unsubscribeDrawing = subscribeToDrawingUpdates((drawingData) => {
@@ -155,6 +171,12 @@ export default function Game() {
           setFeedback(error.message || "An error occurred");
         });
         
+        const unsubscribeRoundTimeUp = subscribeToRoundTimeUp(({ word }) => {
+          setFeedback(`Time's up! The word was: ${word}`);
+          setTimerActive(false);
+          clearInterval(timerIntervalRef.current);
+        });
+        
         // Cleanup subscriptions
         return () => {
           unsubscribeRoom();
@@ -167,6 +189,8 @@ export default function Game() {
           unsubscribeCorrectGuess();
           unsubscribeRoomDeleted();
           unsubscribeErrors();
+          unsubscribeRoundTimeUp();
+          clearInterval(timerIntervalRef.current);
           leaveRoom(roomId, userInfo);
         };
       } catch (error) {
@@ -246,6 +270,25 @@ export default function Game() {
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [mouseDown, currentColor, currentLineWidth, roomId, isDrawer]);
+
+  // Timer function
+  const startTimer = () => {
+    // Clear existing interval if any
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+    }
+    
+    // Start new interval
+    timerIntervalRef.current = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 1) {
+          clearInterval(timerIntervalRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   // Helper functions
   const getCurrentPosition = (e) => {
@@ -403,16 +446,26 @@ export default function Game() {
                   <span className="font-medium">Current Drawer:</span>{" "}
                   {room.players.find(p => p.id === room.currentDrawer)?.name || "Unknown"}
                 </div>
-                {isDrawer && (
-                  <div className="bg-teal-100 text-teal-800 px-3 py-1 rounded-md">
-                    Your word: <span className="font-bold">{room.currentWord}</span>
-                  </div>
-                )}
-                {feedback && (
-                  <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-md">
-                    {feedback}
-                  </div>
-                )}
+                <div className="flex items-center gap-4">
+                  {timerActive && (
+                    <div className={`flex items-center font-bold text-lg ${timeLeft <= 10 ? 'text-red-600' : ''}`}>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                      </svg>
+                      {timeLeft}s
+                    </div>
+                  )}
+                  {isDrawer && (
+                    <div className="bg-teal-100 text-teal-800 px-3 py-1 rounded-md">
+                      Your word: <span className="font-bold">{room.currentWord}</span>
+                    </div>
+                  )}
+                  {feedback && (
+                    <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-md">
+                      {feedback}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
