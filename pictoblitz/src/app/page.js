@@ -70,62 +70,82 @@ export default function Home() {
   };
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px]items-center justify-items-center min-h-screen bg-black p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-        <div>
-          <h1 className="mt-64 text-teal-600 text-8xl p-4 mt-24 relative">Pictoblitz</h1>
-
-          <div className="absolute top-10 right-5 justify-center">
-            <div className="flex flex-row gap-10">
-            <>
+    // <div className="grid grid-rows-[20px_1fr_20px]items-center justify-items-center min-h-screen bg-black p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="min-h-screen flex flex-col bg-blue-50">
+      {/* Header */}
+      <header className="bg-teal-700 text-white shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div className="flex items-center text-2xl font-bold">
+            <span className="text-3xl mr-2">
+              <i className="fas fa-paint-brush"></i>
+            </span>
+            Pictoblitz
+          </div>
+          <div className="flex space-x-4">
+          <>
               {!user ? (
                 <button
                   onClick={handleSignIn}
-                  className="flex items-center justify-center gap-2 bg-teal-700 text-white font-medium py-2 px-4 rounded-md border border-gray-300 hover:shadow-md transition-all hover:scale-105"
+                  className="px-4 py-2 rounded-full bg-white text-teal-700 font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="18"
-                    height="18"
-                  >
-                    {/* Google logo paths */}
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                  </svg>
-                  Login with Google
+                  Sign in
                 </button>
               ) : (
                 <button
                   onClick={handleSignOut}
-                  className="bg-red-600 text-white font-medium py-2 px-4 rounded-md hover:shadow-md transition-all hover:scale-105"
+                  className="px-4 py-2 rounded-full bg-red-600 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
                 >
                   Sign Out
                 </button>
               )}
             </>
-              <Link href="/profile">
-              <button className="flex items-center justify-center gap-2 bg-teal-700 text-white font-medium py-2 px-4 rounded-md border border-gray-300 hover:shadow-md transition-all hover:scale-105">Profile</button>
-              </Link>
-            </div>
+            <Link href="/profile">
+              <button className="px-4 py-2 rounded-full bg-white text-teal-700 font-semibold shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                Profile
+              </button>
+            </Link>
 
           </div>
-
-          <div className="flex flex-col mt-20 gap-10 justify-center items-center">
-            <Link href="/rooms">
-              <button className="flex items-center justify-center gap-2 bg-teal-700 text-white font-medium py-2 px-4 rounded-md border border-gray-300 hover:shadow-md transition-all hover:scale-105">Play Multiplayer</button>
-            </Link>
-            <Link href="/canvas">
-              <button className="flex items-center justify-center gap-2 bg-teal-700 text-white font-medium py-2 px-4 rounded-md border border-gray-300 hover:shadow-md transition-all hover:scale-105">Practice Drawing</button>
-            </Link>
-          </div>
-
-
-
-
-
         </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-grow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col items-center">
+          {/* Hero Section */}
+          <div className="text-center mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-4">
+              Welcome to Pictoblitz!
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 mb-8">
+              Draw, guess, and laugh in this fast-paced multiplayer pictionary game
+            </p>
+          </div>
+
+          {/* Main Actions */}
+          <div className="w-full max-w-md space-y-16 mb-16">
+          <Link href="/rooms">
+            <button 
+              className="w-full px-6 py-5 text-xl font-semibold bg-red-500 text-white rounded-xl shadow-lg flex justify-between items-center hover:bg-red-600 hover:-translate-y-0.5 transition-all duration-300"
+            >
+              Play Multiplayer
+              <span className="text-2xl">
+                <i className="fas fa-users"></i>
+              </span>
+            </button>
+            </Link>
+            
+            <Link href="/canvas">
+            <button className="mt-4 w-full px-6 py-5 text-xl font-semibold bg-white text-blue-600 rounded-xl shadow-md flex justify-between items-center hover:bg-gray-50 hover:-translate-y-0.5 transition-all duration-300">
+              Practice Drawing
+              <span className="text-2xl">
+                <i className="fas fa-pencil-alt"></i>
+              </span>
+            </button>
+            </Link>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
