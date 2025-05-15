@@ -371,22 +371,26 @@ export default function Game() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-black p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <Link href="/">
-            <h1 className="text-teal-600 text-2xl font-bold">Pictoblitz</h1>
-          </Link>
-          <div className="flex gap-2">
-            <button
+    <div className="min-h-screen w-full bg-blue-50 p-4">
+      <header className="bg-teal-700 text-white shadow-md mb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <div className="flex items-center text-2xl font-bold">
+            <Link href="/">
+              <span className="text-3xl mr-2">
+                <i className="fas fa-paint-brush"></i>
+              </span>
+              Pictoblitz
+            </Link>
+          </div>
+          <button
               onClick={handleLeaveRoom}
               className="bg-red-600 text-white font-medium py-1 px-3 rounded-md hover:bg-red-700 transition-all"
             >
               Leave Room
             </button>
-          </div>
         </div>
-
+      </header>
+      <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-4 mb-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold">{room.name}</h2>

@@ -30,6 +30,8 @@ export default function Profile() {
     try {
       await signOut(auth);
       localStorage.removeItem("authToken");
+      localStorage.removeItem("firebaseUser"); // Clear cache on sign-out
+
       router.push('/');
     } catch (error) {
       console.error("Error signing out:", error);
@@ -42,12 +44,21 @@ export default function Profile() {
 
   return (
     <>
-    <div className="min-h-screen w-full bg-black p-8">
+    <div className="min-h-screen w-full bg-blue-50">
+      <header className="bg-teal-700 text-white shadow-md mb-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div className="flex items-center text-2xl font-bold">
+              <Link href="/">
+                <span className="text-3xl mr-2">
+                  <i className="fas fa-paint-brush"></i>
+                </span>
+                Pictoblitz
+              </Link>
+            </div>
+          </div>
+        </header>
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <Link href="/">
-            <h1 className="text-teal-600 text-4xl font-bold">Pictoblitz</h1>
-          </Link>
           <button 
             onClick={handleSignOut}
             className="bg-teal-700 text-white font-medium py-2 px-4 rounded-md hover:bg-teal-800 transition-all"
