@@ -57,7 +57,7 @@ export default function Profile() {
             </div>
           </div>
         </header>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <button 
             onClick={handleSignOut}

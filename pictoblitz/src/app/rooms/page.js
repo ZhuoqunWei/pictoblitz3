@@ -136,7 +136,7 @@ export default function Rooms() {
           </div>
         </div>
       </header>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto px-4">
 
         {error && (
           <div className="bg-red-500 text-white p-4 rounded-md mb-6">
