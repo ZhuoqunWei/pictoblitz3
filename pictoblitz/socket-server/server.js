@@ -20,7 +20,7 @@ const io = new Server(server, {
 
 // Store active rooms
 const rooms = new Map();
-const ROUND_DURATION_MS = 90000; // 90 seconds per round
+// No automatic timer for rounds - rounds will advance manually
 
 // Socket.IO connection handler
 io.on('connection', (socket) => {
@@ -258,7 +258,6 @@ io.on('connection', (socket) => {
       room.currentWord = randomWord;
       room.gameStartedAt = new Date().toISOString();
       room.roundStartedAt = new Date().toISOString();
-      room.roundEndTime = Date.now() + ROUND_DURATION_MS;
       room.lines = [];
 
       // Update room in store
@@ -267,11 +266,6 @@ io.on('connection', (socket) => {
       // Notify all clients in the room
       io.to(roomId).emit('game_started', room);
       console.log(`Game started in room ${roomId}`);
-      
-      // Set timer for round
-      setTimeout(() => {
-        handleRoundTimeout(roomId);
-      }, ROUND_DURATION_MS);
     } catch (error) {
       console.error('Error starting game:', error);
       socket.emit('error', { message: 'Failed to start game' });
@@ -332,7 +326,7 @@ io.on('connection', (socket) => {
       // Check if the guess is correct (case insensitive)
       const isCorrect = guess.toLowerCase().trim() === room.currentWord.toLowerCase();
 
-      // Add message for all players
+      // Create message object
       const message = {
         id: Date.now(),
         userId: user.uid,
@@ -342,8 +336,23 @@ io.on('connection', (socket) => {
         timestamp: new Date().toISOString()
       };
 
-      // Broadcast message to all clients in the room
-      io.to(roomId).emit('new_message', message);
+      // If the guess is correct, only send to the guesser and the drawer
+      if (isCorrect) {
+        // Send to the guesser
+        const guesserSocket = room.players.find(p => p.id === user.uid)?.socketId;
+        if (guesserSocket) {
+          io.to(guesserSocket).emit('new_message', message);
+        }
+        
+        // Send to the drawer
+        const drawerSocket = room.players.find(p => p.id === room.currentDrawer)?.socketId;
+        if (drawerSocket) {
+          io.to(drawerSocket).emit('new_message', message);
+        }
+      } else {
+        // If the guess is incorrect, broadcast to everyone
+        io.to(roomId).emit('new_message', message);
+      }
 
       if (isCorrect) {
         // Update scores
@@ -448,18 +457,12 @@ io.on('connection', (socket) => {
       room.currentWord = randomWord;
       room.lines = [];
       room.roundStartedAt = new Date().toISOString();
-      room.roundEndTime = Date.now() + ROUND_DURATION_MS;
 
       // Update room in store
       rooms.set(roomId, room);
 
       // Notify all clients in the room
       io.to(roomId).emit('round_started', room);
-      
-      // Set timer for round
-      setTimeout(() => {
-        handleRoundTimeout(roomId);
-      }, ROUND_DURATION_MS);
     } catch (error) {
       console.error('Error moving to next round:', error);
       socket.emit('error', { message: 'Failed to start next round' });
@@ -505,96 +508,7 @@ function generateRoomId() {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
-// Handle round timeout
-function handleRoundTimeout(roomId) {
-  const room = rooms.get(roomId);
-  if (!room || room.status !== 'active') return;
-  
-  // Notify all clients that time is up
-  io.to(roomId).emit('round_time_up', {
-    word: room.currentWord
-  });
-  
-  // Check if this was the last round
-  if (room.currentRound >= room.maxRounds) {
-    // End game
-    room.status = 'completed';
-    room.gameEndedAt = new Date().toISOString();
-
-    // Update room in store
-    rooms.set(roomId, room);
-
-    // Notify all clients in the room
-    io.to(roomId).emit('game_over', room);
-  } else {
-    // Auto move to next round after 5 seconds
-    setTimeout(() => {
-      // Find next drawer
-      const currentDrawerIndex = room.players.findIndex(player => player.id === room.currentDrawer);
-      const nextDrawerIndex = (currentDrawerIndex + 1) % room.players.length;
-      const nextDrawer = room.players[nextDrawerIndex].id;
-
-      // Select new word
-      const words = [
-        // Animals
-        'cat', 'dog', 'elephant', 'fish', 'giraffe', 'horse', 'lion', 'monkey', 'penguin', 'rabbit', 
-        'shark', 'snake', 'tiger', 'turtle', 'wolf', 'zebra', 'bear', 'chicken', 'duck', 'owl',
-        
-        // Food & Fruits
-        'apple', 'banana', 'burger', 'cake', 'carrot', 'cheese', 'cookie', 'grapes', 'hamburger', 'ice cream',
-        'lemon', 'orange', 'pizza', 'popcorn', 'sandwich', 'strawberry', 'sushi', 'taco', 'watermelon', 'donut',
-        
-        // Objects
-        'book', 'computer', 'door', 'flower', 'guitar', 'hat', 'key', 'lamp', 'pencil', 'umbrella',
-        'backpack', 'bicycle', 'camera', 'chair', 'clock', 'cup', 'glasses', 'shoes', 'table', 'television',
-        
-        // Places & Nature
-        'beach', 'castle', 'city', 'desert', 'forest', 'house', 'island', 'mountain', 'ocean', 'river',
-        'school', 'sun', 'tree', 'volcano', 'waterfall', 'bridge', 'cave', 'farm', 'park', 'tent',
-        
-        // Transportation
-        'airplane', 'bus', 'car', 'helicopter', 'motorcycle', 'rocket', 'ship', 'submarine', 'train', 'truck',
-        'boat', 'skateboard', 'spaceship', 'tractor', 'ambulance', 'balloon', 'canoe', 'scooter', 'taxi', 'unicycle',
-        
-        // Clothing
-        'jacket', 'shirt', 'shoe', 'sock', 'boot', 'dress', 'glove', 'hat', 'pants', 'scarf',
-        'sweater', 'tie', 'belt', 'crown', 'necklace', 'ring', 'watch', 'helmet', 'swimsuit', 'hoodie',
-        
-        // Sports & Games
-        'baseball', 'basketball', 'football', 'soccer', 'tennis', 'volleyball', 'chess', 'dice', 'frisbee', 'kite',
-        'puzzle', 'snowboard', 'surfboard', 'swing', 'whistle', 'bowling', 'golf', 'hockey', 'karate', 'ski',
-        
-        // Body Parts
-        'arm', 'ear', 'eye', 'foot', 'hand', 'heart', 'leg', 'nose', 'smile', 'tooth',
-        'brain', 'finger', 'hair', 'knee', 'lips', 'muscle', 'shoulder', 'skeleton', 'stomach', 'tongue',
-        
-        // Weather & Nature
-        'cloud', 'fire', 'lightning', 'moon', 'rainbow', 'rain', 'snow', 'star', 'sun', 'tornado',
-        'wind', 'comet', 'earth', 'flower', 'hurricane', 'leaf', 'planet', 'storm', 'wave', 'thunder'
-      ];
-      const randomWord = words[Math.floor(Math.random() * words.length)];
-
-      // Update room
-      room.currentRound = room.currentRound + 1;
-      room.currentDrawer = nextDrawer;
-      room.currentWord = randomWord;
-      room.lines = [];
-      room.roundStartedAt = new Date().toISOString();
-      room.roundEndTime = Date.now() + ROUND_DURATION_MS;
-
-      // Update room in store
-      rooms.set(roomId, room);
-
-      // Notify all clients in the room
-      io.to(roomId).emit('round_started', room);
-      
-      // Set timer for next round
-      setTimeout(() => {
-        handleRoundTimeout(roomId);
-      }, ROUND_DURATION_MS);
-    }, 5000); // Wait 5 seconds before starting next round
-  }
-}
+// No round timeout function needed since rounds advance manually
 
 // Health check route
 app.get('/', (req, res) => {

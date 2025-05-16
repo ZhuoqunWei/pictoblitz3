@@ -43,11 +43,7 @@ export default function Game() {
   const [feedback, setFeedback] = useState("");
   const [messages, setMessages] = useState([]);
   const [isDrawer, setIsDrawer] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(90);
-  const [timerActive, setTimerActive] = useState(false);
-  
   const messagesEndRef = useRef(null);
-  const timerIntervalRef = useRef(null);
 
   // Authentication check
   useEffect(() => {
@@ -95,11 +91,6 @@ export default function Game() {
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
           }
-          
-          // Start the timer
-          setTimeLeft(90);
-          setTimerActive(true);
-          startTimer();
         });
         
         const unsubscribeRoundStarted = subscribeToRoundStarted((gameData) => {
@@ -111,18 +102,11 @@ export default function Game() {
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
           }
-          
-          // Reset and start the timer
-          setTimeLeft(90);
-          setTimerActive(true);
-          startTimer();
         });
         
         const unsubscribeGameOver = subscribeToGameOver((gameData) => {
           setRoom(gameData);
           setFeedback("Game over!");
-          setTimerActive(false);
-          clearInterval(timerIntervalRef.current);
         });
         
         const unsubscribeDrawing = subscribeToDrawingUpdates((drawingData) => {
@@ -158,6 +142,20 @@ export default function Game() {
             setFeedback("Correct! You guessed the word!");
           } else if (drawerId === user.uid) {
             setFeedback("Someone guessed your word!");
+          } else {
+            // For other players, just show that someone guessed correctly without showing the word
+            const guesserName = room.players.find(p => p.id === guesserId)?.name || 'Someone';
+            setFeedback(`${guesserName} guessed correctly!`);
+            
+            // Add a system message to the chat
+            setMessages(prev => [...prev, {
+              id: Date.now(),
+              userId: 'system',
+              sender: 'System',
+              content: `${guesserName} guessed the word correctly!`,
+              isSystem: true,
+              timestamp: new Date().toISOString()
+            }]);
           }
         });
         
@@ -171,11 +169,7 @@ export default function Game() {
           setFeedback(error.message || "An error occurred");
         });
         
-        const unsubscribeRoundTimeUp = subscribeToRoundTimeUp(({ word }) => {
-          setFeedback(`Time's up! The word was: ${word}`);
-          setTimerActive(false);
-          clearInterval(timerIntervalRef.current);
-        });
+        // Remove round time up subscription since we're removing the timer
         
         // Cleanup subscriptions
         return () => {
@@ -189,8 +183,6 @@ export default function Game() {
           unsubscribeCorrectGuess();
           unsubscribeRoomDeleted();
           unsubscribeErrors();
-          unsubscribeRoundTimeUp();
-          clearInterval(timerIntervalRef.current);
           leaveRoom(roomId, userInfo);
         };
       } catch (error) {
@@ -271,24 +263,7 @@ export default function Game() {
     };
   }, [mouseDown, currentColor, currentLineWidth, roomId, isDrawer]);
 
-  // Timer function
-  const startTimer = () => {
-    // Clear existing interval if any
-    if (timerIntervalRef.current) {
-      clearInterval(timerIntervalRef.current);
-    }
-    
-    // Start new interval
-    timerIntervalRef.current = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timerIntervalRef.current);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+  // Timer function removed - rounds will be advanced manually
 
   // Helper functions
   const getCurrentPosition = (e) => {
@@ -451,14 +426,6 @@ export default function Game() {
                   {room.players.find(p => p.id === room.currentDrawer)?.name || "Unknown"}
                 </div>
                 <div className="flex items-center gap-4">
-                  {timerActive && (
-                    <div className={`flex items-center font-bold text-lg ${timeLeft <= 10 ? 'text-red-600' : ''}`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                      </svg>
-                      {timeLeft}s
-                    </div>
-                  )}
                   {isDrawer && (
                     <div className="bg-teal-100 text-teal-800 px-3 py-1 rounded-md">
                       Your word: <span className="font-bold">{room.currentWord}</span>
@@ -555,9 +522,13 @@ export default function Game() {
                   {messages.map((msg) => (
                     <div 
                       key={msg.id} 
-                      className={`p-2 rounded-md ${msg.isCorrect ? 'bg-green-100 text-green-800' : 'bg-gray-100'}`}
+                      className={`p-2 rounded-md ${
+                        msg.isSystem ? 'bg-blue-100 text-blue-800 italic' : 
+                        msg.isCorrect ? 'bg-green-100 text-green-800' : 
+                        'bg-gray-100'
+                      }`}
                     >
-                      <span className="font-medium">{msg.sender}: </span>
+                      {!msg.isSystem && <span className="font-medium">{msg.sender}: </span>}
                       <span>{msg.content}</span>
                       {msg.isCorrect && <span className="ml-2 text-xs">✓ Correct!</span>}
                     </div>
@@ -588,8 +559,11 @@ export default function Game() {
                       onClick={handleNextRound}
                       className="w-full bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700 transition-all"
                     >
-                      Next Round
+                      End Round & Continue
                     </button>
+                    <div className="mt-2 text-sm text-gray-500 text-center">
+                      As the drawer, you control when to move to the next round
+                    </div>
                   </div>
                 )}
               </div>
