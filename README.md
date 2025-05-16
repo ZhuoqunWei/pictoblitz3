@@ -64,3 +64,6 @@ The PictoBlitz project is organized into two main components:
 ## Getting Started
 
 To set up the project locally, follow the instructions in the [Application Usage Guide](./3_Application_Usage.md).
+
+## To try our game...
+Visit this link here https://pictoblitz.vercel.app/
