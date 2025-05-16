@@ -134,15 +134,6 @@ export default function Home() {
               </span>
             </button>
             </Link>
-            
-            <Link href="/canvas">
-            <button className="mt-4 w-full px-6 py-5 text-xl font-semibold bg-white text-blue-600 rounded-xl shadow-md flex justify-between items-center hover:bg-gray-50 hover:-translate-y-0.5 transition-all duration-300">
-              Practice Drawing
-              <span className="text-2xl">
-                <i className="fas fa-pencil-alt"></i>
-              </span>
-            </button>
-            </Link>
           </div>
         </div>
       </main>
